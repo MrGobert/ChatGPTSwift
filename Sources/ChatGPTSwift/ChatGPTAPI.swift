@@ -55,11 +55,25 @@ public class ChatGPTAPI: @unchecked Sendable {
     private func generateMessages(from text: String, systemText: String) -> [Message] {
         var messages = [systemMessage(content: systemText)] + historyList + [Message(role: "user", content: text)]
         if messages.contentCount > (4000 * 4) {
-            _ = historyList.dropFirst()
+//            _ = historyList.dropFirst()
+            print("Pre Delete Count:\(historyList.count)")
+            deleteOldMessages()
+            print("Post Delete Count:\(historyList.count)")
+            print("Initial Prompt:\(historyList.first?.content ?? "")")
             messages = generateMessages(from: text, systemText: systemText)
         }
         return messages
     }
+    
+    private func deleteOldMessages() {
+               removeUnusedMessages()
+        }
+        
+        private func removeUnusedMessages() {
+            let indexesToRemove = [1, 2].filter { $0 < historyList.count }
+            historyList.remove(at: indexesToRemove)
+               }
+        }
     
     private func jsonBody(text: String, model: String, systemText: String, temperature: Double, stream: Bool = true) throws -> Data {
         let request = Request(model: model,
