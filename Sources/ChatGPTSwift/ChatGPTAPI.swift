@@ -277,3 +277,10 @@ public class ChatGPTAPI: @unchecked Sendable {
     
 }
 
+extension Array {
+  mutating func remove(at indexes: [Int]) {
+    for index in indexes.sorted(by: >) {
+      remove(at: index)
+    }
+  }
+}
