@@ -72,7 +72,6 @@ public class ChatGPTAPI: @unchecked Sendable {
         private func removeUnusedMessages() {
             let indexesToRemove = [1, 2].filter { $0 < historyList.count }
             historyList.remove(at: indexesToRemove)
-               }
         }
     
     private func jsonBody(text: String, model: String, systemText: String, temperature: Double, stream: Bool = true) throws -> Data {
