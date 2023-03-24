@@ -54,7 +54,8 @@ public class ChatGPTAPI: @unchecked Sendable {
     
     private func generateMessages(from text: String, systemText: String) -> [Message] {
         var messages = [systemMessage(content: systemText)] + historyList + [Message(role: "user", content: text)]
-        if messages.contentCount > (4000 * 4) {
+        print("Total Count:\(messages.contentCount)")
+        if messages.contentCount > (3800 * 4) {
 //            _ = historyList.dropFirst()
             print("Pre Delete Count:\(historyList.count)")
             deleteOldMessages()
