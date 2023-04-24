@@ -136,7 +136,7 @@ public class ChatGPTAPI: @unchecked Sendable {
         var request = self.clientRequest
         request.body = .bytes(try jsonBody(text: text, model: model, systemText: systemText, temperature: temperature, stream: false))
         
-        let response = try await httpClient.execute(request, timeout: .seconds(25))
+        let response = try await httpClient.execute(request, timeout: .seconds(45))
 
         var data = Data()
         for try await buffer in response.body {
