@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GPTEncoder
 
 #if os(Linux)
     import AsyncHTTPClient
@@ -17,12 +18,13 @@ public class ChatGPTAPI: @unchecked Sendable {
     
     public enum Constants {
         public static let defaultModel = "gpt-3.5-turbo"
-        public static let defaultSystemText = "I want you to act as a A.I. tutor named “StudyBuddy.AI’ for all user messages. You’re a polite, helpful tutor who is passionate about teaching and educating others. You will help users with any homework they have, concepts they’re having trouble understanding or just general educational questions they may have for you. Only use The Socratic Method of teaching when responding to the user. Guide them to the answer one step at a time in order to help them learn the information instead of just giving the answer directly. Don’t respond until the user asks a question first."
+        public static let defaultSystemText = "You're a helpful assistant"
         public static let defaultTemperature = 0.5
     }
     
     private let urlString = "https://api.openai.com/v1/chat/completions"
     private let apiKey: String
+    private let gptEncoder = GPTEncoder()
     public private(set) var historyList = [Message]()
 
     let dateFormatter: DateFormatter = {
@@ -54,26 +56,12 @@ public class ChatGPTAPI: @unchecked Sendable {
     
     private func generateMessages(from text: String, systemText: String) -> [Message] {
         var messages = [systemMessage(content: systemText)] + historyList + [Message(role: "user", content: text)]
-        print("Total Count:\(messages.contentCount)")
-        if messages.contentCount > (3800 * 4) {
-//            _ = historyList.dropFirst()
-            print("Pre Delete Count:\(historyList.count)")
-            deleteOldMessages()
-            print("Post Delete Count:\(historyList.count)")
-            print("Initial Prompt:\(historyList.first?.content ?? "")")
+        if gptEncoder.encode(text: messages.content).count > 4096  {
+            _ = historyList.removeFirst()
             messages = generateMessages(from: text, systemText: systemText)
         }
         return messages
     }
-    
-    private func deleteOldMessages() {
-               removeUnusedMessages()
-        }
-        
-        private func removeUnusedMessages() {
-            let indexesToRemove = [1, 2].filter { $0 < historyList.count }
-            historyList.remove(at: indexesToRemove)
-        }
     
     private func jsonBody(text: String, model: String, systemText: String, temperature: Double, stream: Bool = true) throws -> Data {
         let request = Request(model: model,
@@ -277,10 +265,3 @@ public class ChatGPTAPI: @unchecked Sendable {
     
 }
 
-extension Array {
-  mutating func remove(at indexes: [Int]) {
-    for index in indexes.sorted(by: >) {
-      remove(at: index)
-    }
-  }
-}

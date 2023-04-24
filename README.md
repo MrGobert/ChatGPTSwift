@@ -23,7 +23,7 @@ platform :ios, '15.0'
 use_frameworks!
 
 target 'MyApp' do
-  pod 'ChatGPTSwift', '~> 1.2.3'
+  pod 'ChatGPTSwift', '~> 1.3.1'
 end
 ```
 
@@ -78,20 +78,20 @@ Optionally, you can provide the model, system prompt, temperature, and model lik
 ```swift
 let response = try await api.sendMessage(text: "What is ChatGPT?",
                                          model: "gpt-4",
-                                         systemPrompt: "You are a CS Professor",
+                                         systemText: "You are a CS Professor",
                                          temperature: 0.5)
 ```
 
 Default values for these parameters are:
 - model: `gpt-3.5-turbo`
-- systemPrompt: `You're a helpful assistant`
+- systemText: `You're a helpful assistant`
 - temperature: `0.5`
 
 To learn more about those parameters, you can visit the official [ChatGPT API documentation](https://platform.openai.com/docs/guides/chat/introduction) and [ChatGPT API Introduction Page](https://openai.com/blog/introducing-chatgpt-and-whisper-apis)
 
 ## History List
 
-The client stores the history list of the conversation that will be included in the new prompt so ChatGPT aware of the previous context of conversation. When sending new prompt, the client will make sure the token is not exceeding 4000 (using calculation of 1 token=4chars), in case it exceeded the token, some of previous conversations will be truncated. In future i will provide an API to specify the token threshold as new gpt-4 model accept much bigger 8k tokens in a prompt.
+The client stores the history list of the conversation that will be included in the new prompt so ChatGPT aware of the previous context of conversation. When sending new prompt, the client will make sure the token count is not exceeding 4096 using [GPTEncoder library](https://github.com/alfianlosari/GPTEncoder) to calculate tokens in string, in case it exceeded the token, some of previous conversations will be truncated. In future i will provide an API to specify the token threshold as new gpt-4 model accept much bigger 8k tokens in a prompt.
 
 
 ### View Current History List
@@ -112,7 +112,7 @@ api.deleteHistoryList()
 
 ### Replace History List
 
-You can provide your own History List, this will replace the stored history list. Remember not to pass the 4000 tokens threshold.
+You can provide your own History List, this will replace the stored history list. Remember not to pass the 4096 tokens threshold.
 
 ```swift
 let myHistoryList = [
@@ -124,6 +124,14 @@ let myHistoryList = [
 
 api.replaceHistoryList(with: myHistoryList)
 ```
+
+## GPT Encoder Lib
+I've also created [GPTEncoder](https://github.com/alfianlosari/GPTEncoder) Swift BPE Encoder/Decoder for OpenAI GPT Models. A programmatic interface for tokenizing text for OpenAI GPT API.
+
+## GPT Tokenizer UI Lib
+I've also created [GPTTokenizerUI](https://github.com/alfianlosari/GPTTokenizerUI), a SPM lib you can integrate in your app for providing GUI to input text and show the tokenization results used by GPT API.
+
+![Alt text](https://imagizer.imageshack.com/v2/640x480q70/922/CEVvrE.png "image")
 
 ## Demo Apps
 You can check the demo apps for iOS and macOS from the [SwiftUIChatGPT repo](https://github.com/alfianlosari/ChatGPTSwiftUI)
